@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yamaha Koper</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div style="display: inline-flex; flex-direction: row; gap: 20px; align-items: center;">
+            <img src="logo.png" height="50px">
+            <h1>Yamaha Koper</h1>
+        </div>
+        
+        <div id="save-status" style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;"></div>
+    </header>
+
+    <div class="container">
+        <!-- Browser compatibility warning -->
+        <div id="compatibility-warning" class="card" style="display: none; background: #ff6b6b; color: white; text-align: center;">
+            <h2 style="margin-bottom: 1rem;">⚠️ Brskalnik Ni Podprt</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 1rem;">Ta aplikacija potrebuje File System Access API, ki je na voljo le v brskalnikih Chrome ali Edge.</p>
+            <p>Prosimo, odprite to aplikacijo v enem od naslednjih brskalnikov:</p>
+            <ul style="list-style: none; padding: 0; margin: 1rem 0;">
+                <li>✅ Google Chrome (različica 86 ali novejša)</li>
+                <li>✅ Microsoft Edge (različica 86 ali novejša)</li>
+            </ul>
+            <p style="opacity: 0.9;">Firefox, Safari in drugi brskalniki niso podprti zaradi pomanjkanja dostopa do datotečnega sistema.</p>
+        </div>
+        
+        <!-- File selection screen -->
+        <div id="file-selection-screen" class="card" style="display: none; text-align: center; max-width: 600px; margin: 4rem auto;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">📂</div>
+            <p style="font-size: 1.1rem; margin-bottom: 2rem; color: #666;">Za začetek izberte, kam želite shraniti podatke o vozilih in servisih.</p>
+
+            <div style="margin: 2rem 0;">
+                <button class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="initializeApp()">
+                    <span>📂</span> Izberi Lokacijo za Shranjevanje
+                </button>
+            </div>
+
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #f0f0f0;">
+                <p style="color: #666; margin-bottom: 1rem;">Že imate datoteko s podatki?</p>
+                <button class="btn btn-secondary" onclick="loadExistingFile()">
+                    <span>📁</span> Naloži Obstoječo Datoteko
+                </button>
+            </div>
+
+            <p style="font-size: 0.9rem; color: #999; margin-top: 2rem;">
+                Vaši podatki se bodo samodejno shranili v izbrano datoteko.<br>
+                Aplikacija si bo zapomnila vašo izbiro datoteke za prihodnje seje.
+            </p>
+        </div>
+
+        <!-- File access prompt screen -->
+        <div id="file-access-screen" class="card" style="display: none; text-align: center; max-width: 600px; margin: 4rem auto;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔐</div>
+
+            <div style="margin: 2rem 0;">
+                <button class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;" onclick="accessSavedFile()">
+                    <span>🔓</span> Prijava
+                </button>
+            </div>
+        </div>
+        
+        <div id="main-content" style="display: none;">
+        <div class="nav-tabs">
+            <button class="tab-button active" onclick="switchTab('vehicles')">Vozila</button>
+            <button class="tab-button" onclick="switchTab('services')">Servisi</button>
+        </div>
+
+        <!-- Vehicles Tab -->
+        <div id="vehicles-tab" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Upravljanje Vozil</h2>
+                    <button class="btn btn-primary" onclick="openVehicleModal()">
+                        <span>➕</span> Dodaj Vozilo
+                    </button>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" id="vehicle-search" placeholder="Iščite vozila po lastniku, šasiji, motorju..." onkeyup="filterVehicles()">
+                </div>
+
+                <div class="table-container">
+                    <table id="vehicles-table">
+                        <thead>
+                            <tr>
+                                <th>Ime Lastnika</th>
+                                <th>Motor</th>
+                                <th>Leto</th>
+                                <th>Šasija</th>
+                                <th>Servisi</th>
+                                <th>Dejanja</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehicles-tbody">
+                        </tbody>
+                    </table>
+                    <div id="vehicles-empty" class="empty-state" style="display: none;">
+                        <div class="empty-state-icon">🚗</div>
+                        <p>Nobeno vozilo ni najdeno. Dodajte prvo vozilo za začetek!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Tab -->
+        <div id="services-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Servisi</h2>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" id="service-search" placeholder="Iščite servise po imenu, vozilu ali opombah..." onkeyup="filterServices()">
+                </div>
+
+                <div class="table-container">
+                    <table id="services-table">
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Vozilo</th>
+                                <th>Servis</th>
+                                <th>Kilometri</th>
+                                <th>Opombe</th>
+                                <th>Dejanja</th>
+                            </tr>
+                        </thead>
+                        <tbody id="services-tbody">
+                        </tbody>
+                    </table>
+                    <div id="services-empty" class="empty-state" style="display: none;">
+                        <div class="empty-state-icon">🔧</div>
+                        <p>Še ni zabeleženih servisov. Dodajte servise preko podrobnosti vozila.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Vehicle Modal -->
+    <div id="vehicle-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Dodaj/Uredi Vozilo</h3>
+                <button class="close-btn" onclick="closeVehicleModal()">&times;</button>
+            </div>
+            <form id="vehicle-form" onsubmit="saveVehicle(event)">
+                <input type="hidden" id="vehicle-id">
+                <div class="form-group">
+                    <label for="owner-name">Ime Lastnika *</label>
+                    <input type="text" id="owner-name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="engine">Motor *</label>
+                        <input type="text" id="engine" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Leto *</label>
+                        <input type="number" id="year" min="1900" max="2100" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="chassis-id">Šasija *</label>
+                    <input type="text" id="chassis-id" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Shrani Vozilo</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeVehicleModal()">Prekliči</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Vehicle Details Modal -->
+    <div id="vehicle-details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Podrobnosti Vozila</h3>
+                <button class="close-btn" onclick="closeVehicleDetails()">&times;</button>
+            </div>
+            <div id="vehicle-info"></div>
+            <div class="card-header">
+                <h4>Zgodovina Servisov</h4>
+                <button class="btn btn-primary btn-sm" onclick="openServiceModal()">Dodaj Servis</button>
+            </div>
+            <div id="vehicle-services" class="service-list"></div>
+        </div>
+    </div>
+
+    <!-- Service Modal -->
+    <div id="service-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Dodaj/Uredi Servis</h3>
+                <button class="close-btn" onclick="closeServiceModal()">&times;</button>
+            </div>
+            <form id="service-form" onsubmit="saveService(event)">
+                <input type="hidden" id="service-id">
+                <input type="hidden" id="service-vehicle-id">
+                <div class="form-group">
+                    <label for="service-name">Ime Servisa *</label>
+                    <input type="text" id="service-name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="service-mileage">Kilometerina *</label>
+                        <input type="number" id="service-mileage" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="service-date">Datum *</label>
+                        <input type="date" id="service-date" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="service-notes">Opombe/Komentarji</label>
+                    <textarea id="service-notes"></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Shrani Servis</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeServiceModal()">Prekliči</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+        </div>
+    </div>
+
+
+    <script src="constants.js"></script>
+    <script src="utils.js"></script>
+    <script src="error-handler.js"></script>
+    <script src="modal-manager.js"></script>
+    <script src="table-manager.js"></script>
+    <script src="data-handler.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
