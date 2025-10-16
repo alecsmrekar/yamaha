@@ -147,6 +147,15 @@ async function saveVehicle(event) {
         // Validate data
         ErrorHandler.validateVehicleData(vehicleData);
 
+        // Check for duplicate chassis number
+        const existingVehicle = app.vehicles.find(v =>
+            v.chassisId === vehicleData.chassisId && v.id !== vehicleId
+        );
+
+        if (existingVehicle) {
+            throw new Error(`Vozilo s šasijsko številko "${vehicleData.chassisId}" že obstaja v bazi podatkov. Lastnik: ${existingVehicle.ownerName}`);
+        }
+
         if (vehicleId) {
             // Update existing vehicle
             const index = app.vehicles.findIndex(v => v.id === vehicleId);

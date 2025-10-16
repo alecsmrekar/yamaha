@@ -150,7 +150,7 @@ class TableManager {
                     <span class="${CONSTANTS.CLASSES.SERVICE_DATE}">${safeService.date}</span>
                 </div>
                 <div class="${CONSTANTS.CLASSES.SERVICE_DETAILS}">
-                    <div><strong>Kilometerina:</strong> ${safeService.mileage} km</div>
+                    <div><strong>Kilometri:</strong> ${safeService.mileage} km</div>
                     ${safeService.notes ? `<div><strong>Opombe:</strong> ${safeService.notes}</div>` : ''}
                 </div>
                 <div class="${CONSTANTS.CLASSES.ACTION_BUTTONS}" style="margin-top: 0.5rem;">
