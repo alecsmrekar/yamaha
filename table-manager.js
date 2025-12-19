@@ -38,7 +38,9 @@ class TableManager {
 
         Utils.hideElement(CONSTANTS.ELEMENTS.VEHICLES_EMPTY);
 
-        tbody.innerHTML = vehicles.map(vehicle => {
+        const sortedVehicles = [...vehicles].sort((a, b) => b.id.localeCompare(a.id));
+
+        tbody.innerHTML = sortedVehicles.map(vehicle => {
             const serviceCount = services.filter(s => s.vehicleId === vehicle.id).length;
             return this.createVehicleRow(vehicle, serviceCount);
         }).join('');
