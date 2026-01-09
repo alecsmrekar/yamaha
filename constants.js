@@ -6,6 +6,7 @@ const CONSTANTS = {
         SAVE_STATUS: 'save-status',
         FILE_SELECTION_SCREEN: 'file-selection-screen',
         FILE_ACCESS_SCREEN: 'file-access-screen',
+        FORGET_FILE_BTN: 'forget-file-btn',
 
         VEHICLES_TBODY: 'vehicles-tbody',
         VEHICLES_EMPTY: 'vehicles-empty',
@@ -55,6 +56,8 @@ const CONSTANTS = {
     MESSAGES: {
         DELETE_VEHICLE_CONFIRM: 'Ali ste prepričani, da želite izbrisati to vozilo? Vsi povezani servisi bodo tudi izbrisani.',
         DELETE_SERVICE_CONFIRM: 'Ali ste prepričani, da želite izbrisati ta servis?',
+        FORGET_FILE_CONFIRM: 'Ali ste prepričani, da želite pozabiti to datoteko? Podatki v datoteki bodo ohranjeni, vendar boste morali datoteko znova izbrati.',
+        FILE_NOT_FOUND: 'Datoteka ni bila najdena. Morda je bila premaknjena, preimenovana ali izbrisana. Prosimo, izberite datoteko znova.',
         NO_VEHICLES_SEARCH: 'Nobeno vozilo ne ustreza vašim iskalnima kriterijem.',
         NO_SERVICES_SEARCH: 'Noben servis ne ustreza vašim iskalnima kriterijem.',
         UNKNOWN_VEHICLE: 'Neznano Vozilo'

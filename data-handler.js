@@ -51,7 +51,8 @@ class DataHandler {
         } catch (e) {
             console.error('Failed to read file:', e);
             if (e.name === 'NotFoundError') {
-                this.clearFileHandle();
+                await this.forgetFile();
+                return { vehicles: [], services: [], fileNotFound: true };
             } else if (e instanceof SyntaxError) {
                 console.error('File contains invalid JSON, treating as empty');
                 // File exists but has invalid JSON - treat as empty and overwrite
@@ -182,6 +183,28 @@ class DataHandler {
 
     clearFileHandle() {
         this.fileHandle = null;
+    }
+
+    async forgetFile() {
+        this.fileHandle = null;
+
+        if (!this.db) return;
+
+        try {
+            const transaction = this.db.transaction(['fileHandles'], 'readwrite');
+            const store = transaction.objectStore('fileHandles');
+            const request = store.delete('primary');
+
+            await new Promise((resolve, reject) => {
+                request.onsuccess = () => {
+                    console.log('File handle removed from IndexedDB');
+                    resolve();
+                };
+                request.onerror = () => reject(request.error);
+            });
+        } catch (e) {
+            console.error('Error removing file handle:', e);
+        }
     }
 
     async saveData(vehicles, services) {

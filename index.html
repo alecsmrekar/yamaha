@@ -13,8 +13,14 @@
             <h1>Yamaha Koper</h1>
         </div>
         
-        <div id="save-status" style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;"></div>
     </header>
+
+    <div class="container">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
+            <div id="save-status" style="font-size: 0.9rem; opacity: 0.8;"></div>
+            <button id="forget-file-btn" class="btn" style="display: none; background: #dc3545; color: white; font-size: 0.8rem; padding: 0.3rem 0.6rem;" onclick="forgetFile()">Pozabi Datoteko</button>
+        </div>
+    </div>
 
     <div class="container">
         <!-- Browser compatibility warning -->

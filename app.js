@@ -43,6 +43,7 @@ function showFileAccessPrompt() {
     Utils.showElement(CONSTANTS.ELEMENTS.FILE_ACCESS_SCREEN);
     Utils.hideElement(CONSTANTS.ELEMENTS.MAIN_CONTENT);
     Utils.hideElement(CONSTANTS.ELEMENTS.SAVE_STATUS);
+    Utils.hideElement(CONSTANTS.ELEMENTS.FORGET_FILE_BTN);
     Utils.hideElement(CONSTANTS.ELEMENTS.FILE_SELECTION_SCREEN);
 }
 
@@ -50,6 +51,14 @@ function showFileAccessPrompt() {
 async function accessSavedFile() {
     await ErrorHandler.handleAsync(async () => {
         const data = await window.dataHandler.loadFileData();
+
+        if (data.fileNotFound) {
+            alert(CONSTANTS.MESSAGES.FILE_NOT_FOUND);
+            Utils.showElement(CONSTANTS.ELEMENTS.FILE_SELECTION_SCREEN);
+            Utils.hideElement(CONSTANTS.ELEMENTS.FILE_ACCESS_SCREEN);
+            return;
+        }
+
         app.vehicles = data.vehicles || [];
         app.services = data.services || [];
         showMainApp();
@@ -63,10 +72,28 @@ function showMainApp() {
     Utils.hideElement(CONSTANTS.ELEMENTS.FILE_ACCESS_SCREEN);
     Utils.showElement(CONSTANTS.ELEMENTS.MAIN_CONTENT);
     Utils.showElement(CONSTANTS.ELEMENTS.SAVE_STATUS);
+    Utils.showElement(CONSTANTS.ELEMENTS.FORGET_FILE_BTN);
 
     renderVehicles();
     renderServices();
     Utils.setTodayDate(CONSTANTS.ELEMENTS.SERVICE_DATE);
+    updateSaveStatus();
+}
+
+// Forget file and return to file selection
+async function forgetFile() {
+    if (!Utils.showConfirmDialog(CONSTANTS.MESSAGES.FORGET_FILE_CONFIRM)) {
+        return;
+    }
+
+    await window.dataHandler.forgetFile();
+    app.vehicles = [];
+    app.services = [];
+
+    Utils.hideElement(CONSTANTS.ELEMENTS.MAIN_CONTENT);
+    Utils.hideElement(CONSTANTS.ELEMENTS.SAVE_STATUS);
+    Utils.hideElement(CONSTANTS.ELEMENTS.FORGET_FILE_BTN);
+    Utils.showElement(CONSTANTS.ELEMENTS.FILE_SELECTION_SCREEN);
     updateSaveStatus();
 }
 
@@ -344,9 +371,9 @@ function updateSaveStatus() {
 
     if (window.dataHandler.fileHandle) {
         const fileName = window.dataHandler.fileHandle.name;
-        statusEl.textContent = `✓ Auto-saving to file: ${fileName}`;
+        statusEl.textContent = `✓ Samodejno shranjevanje v: ${fileName}`;
         statusEl.style.color = '#51cf66';
-        statusEl.title = `Connected to file: ${fileName}`;
+        statusEl.title = `Povezano z datoteko: ${fileName}`;
     } else {
         statusEl.textContent = '';
         statusEl.title = '';
