@@ -3,6 +3,7 @@ class MechanicShopApp {
     constructor() {
         this.vehicles = [];
         this.services = [];
+        this.shopTitle = '';
         this.currentVehicleId = null;
         this.modalManager = new ModalManager();
         this.tableManager = new TableManager();
@@ -61,7 +62,9 @@ async function accessSavedFile() {
 
         app.vehicles = data.vehicles || [];
         app.services = data.services || [];
+        app.shopTitle = data.shopTitle || '';
         showMainApp();
+        if (!app.shopTitle) promptShopTitle();
     }, 'Failed to access saved file');
 }
 
@@ -73,6 +76,8 @@ function showMainApp() {
     Utils.showElement(CONSTANTS.ELEMENTS.MAIN_CONTENT);
     Utils.showElement(CONSTANTS.ELEMENTS.SAVE_STATUS);
     Utils.showElement(CONSTANTS.ELEMENTS.FORGET_FILE_BTN);
+    Utils.showElement(CONSTANTS.ELEMENTS.EDIT_TITLE_BTN);
+    updateShopTitle();
 
     renderVehicles();
     renderServices();
@@ -93,7 +98,10 @@ async function forgetFile() {
     Utils.hideElement(CONSTANTS.ELEMENTS.MAIN_CONTENT);
     Utils.hideElement(CONSTANTS.ELEMENTS.SAVE_STATUS);
     Utils.hideElement(CONSTANTS.ELEMENTS.FORGET_FILE_BTN);
+    Utils.hideElement(CONSTANTS.ELEMENTS.EDIT_TITLE_BTN);
     Utils.showElement(CONSTANTS.ELEMENTS.FILE_SELECTION_SCREEN);
+    app.shopTitle = '';
+    updateShopTitle();
     updateSaveStatus();
 }
 
@@ -104,6 +112,7 @@ async function initializeApp() {
         if (success) {
             await saveData();
             showMainApp();
+            promptShopTitle();
         }
     }, 'Failed to initialize app');
 }
@@ -116,8 +125,10 @@ async function loadExistingFile() {
         if (data && data.vehicles && data.services) {
             app.vehicles = data.vehicles;
             app.services = data.services;
+            app.shopTitle = data.shopTitle || '';
             await saveData();
             showMainApp();
+            if (!app.shopTitle) promptShopTitle();
         }
     }, 'Failed to load existing file');
 }
@@ -354,7 +365,7 @@ function filterServices() {
 async function saveData() {
     await ErrorHandler.handleAsync(async () => {
         if (window.dataHandler.fileHandle) {
-            await window.dataHandler.saveData(app.vehicles, app.services);
+            await window.dataHandler.saveData(app.vehicles, app.services, app.shopTitle);
         }
         updateSaveStatus();
     }, 'Failed to save data', false);
@@ -364,6 +375,31 @@ async function loadData() {
     const data = await window.dataHandler.initialize();
     app.vehicles = data.vehicles || [];
     app.services = data.services || [];
+    app.shopTitle = data.shopTitle || '';
+}
+
+function updateShopTitle() {
+    const titleEl = document.getElementById(CONSTANTS.ELEMENTS.SHOP_TITLE);
+    titleEl.textContent = app.shopTitle || 'Servis Vozil';
+    document.title = app.shopTitle || 'Servis Vozil';
+}
+
+function promptShopTitle() {
+    const title = prompt('Vnesite ime trgovine / servisa:');
+    if (title && title.trim()) {
+        app.shopTitle = title.trim();
+        updateShopTitle();
+        saveData();
+    }
+}
+
+function editShopTitle() {
+    const title = prompt('Vnesite ime trgovine / servisa:', app.shopTitle);
+    if (title !== null && title.trim()) {
+        app.shopTitle = title.trim();
+        updateShopTitle();
+        saveData();
+    }
 }
 
 function updateSaveStatus() {

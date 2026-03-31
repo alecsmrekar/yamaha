@@ -30,7 +30,10 @@ const CONSTANTS = {
         SERVICE_NAME: 'service-name',
         SERVICE_MILEAGE: 'service-mileage',
         SERVICE_DATE: 'service-date',
-        SERVICE_NOTES: 'service-notes'
+        SERVICE_NOTES: 'service-notes',
+
+        SHOP_TITLE: 'shop-title',
+        EDIT_TITLE_BTN: 'edit-title-btn'
     },
 
     // CSS Classes - only commonly used ones

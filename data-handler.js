@@ -46,7 +46,8 @@ class DataHandler {
             // Ensure the data has the expected structure
             return {
                 vehicles: data.vehicles || [],
-                services: data.services || []
+                services: data.services || [],
+                shopTitle: data.shopTitle || ''
             };
         } catch (e) {
             console.error('Failed to read file:', e);
@@ -207,20 +208,20 @@ class DataHandler {
         }
     }
 
-    async saveData(vehicles, services) {
+    async saveData(vehicles, services, shopTitle) {
         if (!this.fileHandle) return;
-        
+
         // Ensure we have permission before trying to save
         const hasPermission = await this.ensurePermission();
         if (!hasPermission) {
             console.error('No permission to write to file');
             return;
         }
-        
-        // Ensure we always have valid arrays
-        const data = { 
-            vehicles: vehicles || [], 
-            services: services || [] 
+
+        const data = {
+            shopTitle: shopTitle || '',
+            vehicles: vehicles || [],
+            services: services || []
         };
         
         try {
@@ -268,11 +269,15 @@ class DataHandler {
             
             const file = await fileHandle.getFile();
             const data = JSON.parse(await file.text());
-            
+
             this.fileHandle = fileHandle;
             await this.saveFileHandle();
-            
-            return data;
+
+            return {
+                shopTitle: data.shopTitle || '',
+                vehicles: data.vehicles || [],
+                services: data.services || []
+            };
         } catch (err) {
             if (err.name !== 'AbortError') {
                 console.error('Error loading file:', err);
